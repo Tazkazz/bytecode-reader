@@ -9,6 +9,9 @@ class ByteReader(filename: String) {
     val available: Boolean
         get() = index < data.size
 
+    val unreadBytes: Int
+        get() = data.size - index
+
     fun readByte(): Int {
         return data[index++].to256Int()
     }

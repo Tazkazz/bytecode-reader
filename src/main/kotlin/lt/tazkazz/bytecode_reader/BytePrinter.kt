@@ -1,33 +1,25 @@
 package lt.tazkazz.bytecode_reader
 
-class BytePrinter {
+interface BytePrinter {
+    fun printBytes(title: String, bytes: List<Int>, suffixFn: ((Int) -> String?)? = null)
+    fun printTitle(title: String, symbol: String = "-", count: Int = 3)
+}
+
+class VerboseBytePrinter : BytePrinter {
     private var index = 0
 
-    fun printBytes(title: String, bytes: List<Int>, suffixFn: (Int) -> String?) {
+    override fun printBytes(title: String, bytes: List<Int>, suffixFn: ((Int) -> String?)?) {
         printTitle(title)
-        bytes.forEach { printByte(it, suffixFn) }
+        bytes.forEach { byte -> printByte(byte, suffixFn?.let { it(byte) }) }
         println()
     }
 
-    fun printBytes(title: String, bytes: List<Int>) {
-        printTitle(title)
-        bytes.forEach(::printByte)
-        println()
+    override fun printTitle(title: String, symbol: String, count: Int) {
+        val line = symbol.repeat(count)
+        println("$line $title $line")
     }
 
-    fun printTitle(title: String) {
-        println("--- $title ---")
-    }
-
-    fun printByte(byte: Int) {
-        printByte(byte, null)
-    }
-
-    fun printByte(byte: Int, suffixFn: (Int) -> String?) {
-        printByte(byte, suffixFn(byte))
-    }
-
-    fun printByte(byte: Int, suffix: String? = null) {
+    private fun printByte(byte: Int, suffix: String? = null) {
         val line = listOfNotNull(
             index++.hex(4),
             byte.hex(),
@@ -37,4 +29,9 @@ class BytePrinter {
         ).joinToString(separator = "  ")
         println(line)
     }
+}
+
+class SilentBytePrinter : BytePrinter {
+    override fun printBytes(title: String, bytes: List<Int>, suffixFn: ((Int) -> String?)?) {}
+    override fun printTitle(title: String, symbol: String, count: Int) {}
 }
